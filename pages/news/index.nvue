@@ -1,0 +1,248 @@
+<template>
+	<view class="tabs">
+		<view class="line" style="margin-top: 0;">
+			<view class="item" v-for="(i, x) in title" :key="x">
+				<text >{{i}}</text>
+			</view>
+		</view>
+		<view class="line" v-for="(item, index) in list" :key="index" >
+			<view class="item" v-for="(i, x) in item" :key="x">
+				<text style="color: #fff;">{{i}}</text>
+			</view>
+		</view>
+		<view class="mask">
+			<view class="mask-wrap">
+				<view class="mask-line" v-for="(item, index) in allList" :key="index" >
+					<view class="mask-item" v-for="(i, x) in item" :key="x">
+						<text style="color: #666;">{{i}}</text>
+					</view>
+				</view>
+				<movable-area class="movable-area" @click="set">
+					<movable-view class="movable-view" direction="all" :x="x" :y="y" @change="onChange">text</movable-view>
+				</movable-area>
+			</view>
+			
+			
+		</view>
+	</view>
+</template>
+
+<script>
+	// #ifdef APP-PLUS
+	const dom = weex.requireModule('dom');
+	// #endif
+
+	const allList = [
+		[26, 27, 28, 29, 30, 31, 1,	2, 3, 4, 5,	6, 7],
+		[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+		[9, 10, 11, 12, 13, 14, 15,	16, 17, 18, 19,	20, 21],
+		[16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28],
+		[23, 24, 25, 26, 27, 28, 29, 30, 31, 1,	2, 3, 4],
+		[30, 31, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+	]
+
+	export default {
+		components: {
+		},
+		data() {
+			return {
+				title: ['一', '二', '三', '四', '五', '六', '日'],
+				list: [],
+				allList: allList,
+				x: 0,
+				y: 0,
+			}
+		},
+		onReady() {
+			const newList = allList.map(item => item.slice(0, 7))
+			this.list = newList
+			// console.log('newList', newList)
+		},
+		methods: {
+			set() {
+				// plus.screen.lockOrientation('portrait-primary'); //锁定
+				plus.screen.lockOrientation('landscape-primary'); //锁定
+				
+			},
+			onChange(e) {
+				console.log('newList', e.detail.x, e.detail.y)
+				// this.old.x = e.detail.x
+				this.$nextTick(function() {
+					this.x = 20
+				})
+				 
+			}
+		}
+	}
+</script>
+
+<style>
+	/* #ifndef APP-PLUS */
+	page {
+		width: 100%;
+		min-height: 100%;
+		display: flex;
+	}
+
+	/* #endif */
+	
+	.line {
+		margin-top: 10upx;
+		width: 100%;
+		width: 750upx;
+		flex-direction: row;
+		justify-content: space-between;
+		
+	}
+	.item {
+		/* flex: 1; */
+		height: 100upx;
+		width: 100upx;
+		background-color: #007AFF;
+		align-items: center;
+		justify-content: center;
+	}
+	.mask {
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.mask-wrap {
+		position: relative;
+		width: 1300upx;
+		height: 600upx;
+		background-color: rgba(0, 255, 0, 0.3);
+	}
+	.mask-line {
+		/* margin-top: 10upx; */
+		width: 100%;
+		flex-direction: row;
+		/* justify-content: space-between; */
+	}
+	.mask-item {
+		/* margin-right: 1upx; */
+		height: 80upx;
+		width: 105upx;
+		/* background-color: #007AFF; */
+		align-items: center;
+		justify-content: center;
+		border-color: #555555;
+		border-width: 1upx;
+	}
+	
+	.movable-area {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 1300upx;
+		height: 480upx;
+		background-color: rgba(255, 0, 0, 0.3);
+		/* background-color: #22ac38; */
+	}
+	
+	.movable-view {
+		width: 735upx;
+		height: 480upx;
+		background-color: rgba(255, 255, 0, 0.3);
+		/* border-color: #ff0;
+		border-width: 1upx; */
+	}
+	.mask {
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #fff;
+	}
+	
+	
+	
+	
+
+	.tab-bar {
+		width: 750upx;
+		height: 84upx;
+		flex-direction: row;
+		/* #ifndef APP-PLUS */
+		white-space: nowrap;
+		/* #endif */
+	}
+
+	/* #ifndef APP-NVUE */
+	.tab-bar ::-webkit-scrollbar {
+	    display: none;  
+	    width: 0 !important;  
+	    height: 0 !important;  
+	    -webkit-appearance: none;  
+	    background: transparent;  
+	}
+	/* #endif */
+
+	.scroll-view-indicator {
+		position: relative;
+		height: 2px;
+		background-color: transparent;
+	}
+
+	.scroll-view-underline {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 0;
+		background-color: #007AFF;
+	}
+
+	.scroll-view-animation {
+		transition-duration: 0.2s;
+		transition-property: left;
+	}
+
+	.tab-bar-line {
+		height: 1upx;
+		background-color: #cccccc;
+	}
+
+	.tab-box {
+		flex: 1;
+	}
+
+	.uni-tab-item {
+		/* #ifndef APP-PLUS */
+		display: inline-block;
+		/* #endif */
+		flex-wrap: nowrap;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+
+	.uni-tab-item-title {
+		color: #555;
+		font-size: 30upx;
+		height: 80upx;
+		line-height: 80upx;
+		flex-wrap: nowrap;
+		/* #ifndef APP-PLUS */
+		white-space: nowrap;
+		/* #endif */
+	}
+
+	.uni-tab-item-title-active {
+		color: #007AFF;
+	}
+
+	.swiper-item {
+		flex: 1;
+		flex-direction: column;
+	}
+
+	.page-item {
+		flex: 1;
+		flex-direction: row;
+		position: absolute;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+	}
+</style>
