@@ -14,11 +14,11 @@
 			<view class="mask-wrap">
 				<view class="mask-line" v-for="(item, index) in allList" :key="index" >
 					<view class="mask-item" v-for="(i, x) in item" :key="x">
-						<text style="color: #666;">{{i}}</text>
+						<text class="mask-text">{{i}}</text>
 					</view>
 				</view>
 				<movable-area class="movable-area" @click="set">
-					<movable-view class="movable-view" direction="all" :x="x" :y="y" @change="onChange">text</movable-view>
+					<movable-view class="movable-view" direction="all" :x="x" :y="y" @change="onChange"></movable-view>
 				</movable-area>
 			</view>
 			
@@ -109,8 +109,9 @@
 	
 	.mask-wrap {
 		position: relative;
-		width: 1300upx;
-		height: 600upx;
+		width: 1344upx;
+		/* width: 315upx; */
+		height: 480upx;
 		background-color: rgba(0, 255, 0, 0.3);
 	}
 	.mask-line {
@@ -129,19 +130,23 @@
 		border-color: #555555;
 		border-width: 1upx;
 	}
+	.mask-text {
+		color: #666;
+		font-size: 18px;
+	}
 	
 	.movable-area {
 		position: absolute;
 		left: 0;
 		top: 0;
-		width: 1300upx;
+		width: 1344upx;
 		height: 480upx;
 		background-color: rgba(255, 0, 0, 0.3);
 		/* background-color: #22ac38; */
 	}
 	
 	.movable-view {
-		width: 735upx;
+		width: 726upx;
 		height: 480upx;
 		background-color: rgba(255, 255, 0, 0.3);
 		/* border-color: #ff0;
