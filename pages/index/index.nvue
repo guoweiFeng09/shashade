@@ -1,0 +1,255 @@
+<template>
+	<view class="tabs">
+		<view class="bg"></view>
+		 <swiper class="swiper" :indicator-dots="true" autoplay :interval="5000" :duration="1000" circular >
+			<swiper-item class="swiper-item" v-for="item in swiperUrl">
+				<image class="swiper-image" :src="item" mode="" @click="previewImage(item)"></image>
+			</swiper-item>
+		</swiper>
+		
+		<view class="time-wrap">
+			<view class="time">
+				<text class="time-left">{{day}}天</text>
+				<view class="time-right">
+					<text class="time-right-date LcdD">{{date}}</text>
+					<text class="time-right-time LcdD">{{time}}</text>
+				</view>
+			</view>
+			<image class="time-wrap-avatar" src="/static/index/avatar2.jpg" mode=""></image>
+			<image class="time-wrap-avatar time-wrap-me" src="/static/index/avatar1.jpg" mode=""></image>
+		</view>
+		<view class="list">
+			<view class="list-line">
+				<view class="list-item" @click="gotoSnow">
+					<image class="list-item-image" src="/static/index/snow.jpg" mode=""></image>
+					<text class="list-item-text">下雪啦</text>
+				</view>
+				<!-- <view class="list-item" @click="gotoTodoList"> -->
+				<view class="list-item">
+					<image class="list-item-image" src="/static/index/wait.jpg" mode=""></image>
+					<!-- <text>期待~</text> -->
+				</view>
+			</view>
+		</view> 
+	</view>
+</template>
+
+<script>
+	// #ifdef APP-PLUS
+	const dom = weex.requireModule('dom');
+	// #endif
+	import { timeFormat, DateDiff } from '@/utils/tool.js'
+	
+	export default {
+		components: {
+		},
+		data() {
+			return {
+				swiperUrl: [
+					'/static/index/swiper1.jpg',
+					'/static/index/swiper2.png',
+					'/static/index/swiper3.jpg',
+					'/static/index/swiper4.jpg',
+				],
+				
+				day: 0,
+				date: '',
+				time: '',
+				
+			}
+		},
+		onReady() {
+			this.checkUpdate()
+			
+			setInterval(() => {
+				const now = new Date()
+				this.date = timeFormat(now, 'yyyy-MM-dd')
+				this.time = timeFormat(now, 'hh:mm:ss')
+				this.getDays()
+				// console.log('timeFormat', this.time)
+			}, 1000)
+		},
+		beforeCreate() {
+			const domModule = uni.requireNativePlugin('dom')
+			domModule.addRule('fontFace', {
+				'fontFamily': "fontLcdD",
+				'src': "url('https://vkceyugu.cdn.bspapp.com/VKCEYUGU-321867fe-4c25-4a3d-9f1f-018855bc5a44/cfb9ccab-061e-4774-921d-70bde7276d7d.ttf')"
+			});
+		},
+		methods: {
+			checkUpdate() {
+				console.log('checkUpdate')
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'getVersion'
+					}
+				}).then(res => {
+					const {lastVerson, downloadUrl} = res.result
+					if(lastVerson > uni.appVersion) {
+						uni.showModal({
+						    title: '大人',
+						    content: '小的检测到有更新, 要不要更新呀',
+						    success:  res => {
+						        if (res.confirm) {
+						            this.updateApp(downloadUrl)
+						        } else if (res.cancel) {
+						            console.log('用户点击取消')
+						        }
+						    }
+						})
+					}
+				}).catch(err => {
+					console.log('err', err)  
+				})
+			},
+			updateApp(url) {
+				console.log('updateApp') 
+				uni.showLoading({
+				    title: 'app下载中..'
+				})
+				uni.downloadFile({
+					url: url,
+					success: function(a) {
+						if (200 === a.statusCode) {
+							uni.hideLoading()
+							var b = a.tempFilePath;
+							
+							uni.saveFile({
+								tempFilePath: b,
+								success: function(a) {
+									plus.runtime.install(a.savedFilePath, {
+										force: !0
+									})
+								}
+							})
+						}
+					}
+				})
+			},
+			gotoSnow() {
+				uni.navigateTo({
+					url: '/pages/webview/index'
+				})
+			},
+			gotoTodoList() {
+				uni.navigateTo({
+					url: '/pages/todo/list'
+				})
+			},
+			getDays() {
+				this.day =  DateDiff('2020-07-11', timeFormat(new Date(), 'yyyy-MM-dd'))
+			},
+			previewImage(url) {
+				uni.previewImage({
+					urls: [url]
+				})
+			},
+			
+			
+		}
+	}
+</script>
+
+<style lang="scss">
+	.LcdD {
+		font-family: fontLcdD;
+		// font-size:60rpx;
+		color: #fff;
+		padding-right: 4rpx;
+	}
+	.tabs {
+		background-color: #aecfff; 
+		background-image: linear-gradient(to bottom, #999, #fff);
+		flex:1;  
+		align-items: center;
+	}
+	.swiper {
+		width: 750rpx;
+		height: 400rpx;
+	}
+	.clock {
+		width: 400rpx;
+		height: 400rpx;
+	}
+	.time-wrap {
+		margin-top: 20rpx;
+		position: relative;
+		width: 720rpx;
+		height: 260rpx;
+		justify-content: flex-end;
+		&-avatar {
+			position: absolute;
+			width: 100rpx;
+			height: 100rpx;
+			top: 0rpx;
+			left: 30rpx;
+			border-radius: 50%;
+		}
+		&-me {
+			left: 110rpx;
+		}
+	}
+	.time {
+		width: 720rpx;
+		height: 200rpx;
+		padding: 30rpx;
+		border-radius: 16rpx;
+		background-color: #ff8f0a;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		opacity: 0.8;
+		&-left {
+			font-size: 72rpx;
+			color: #fff;
+		}
+		&-right {
+			align-items: flex-end;
+			&-date {
+				font-size: 40rpx;
+				color: #ccc;
+			}
+			&-time {
+				font-size: 30rpx;
+				color: #ccc;
+			}
+		}
+		
+	}
+	
+	.list {
+		padding: 30rpx;
+		margin-top: 10rpx;
+		width: 750rpx;
+		// align-items: center;
+		&-line {
+			flex-direction: row;
+			justify-content: space-between;
+		}
+		&-item {
+			position: relative;
+			width: 330rpx;
+			height: 330rpx;
+			border-radius: 16rpx;
+			background-color: #fff;
+			padding-bottom: 30rpx;
+			align-items: center;
+			justify-content: flex-end;
+			&-image {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 330rpx;
+				height: 330rpx;
+				border-radius: 16rpx;
+			}
+			// &-text {
+			// 	color: #ffcd43;
+			// }
+		
+		}
+	}
+	
+	
+</style>

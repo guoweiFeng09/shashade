@@ -1,0 +1,46 @@
+<template>
+	<view class="content">
+		<view class="list">
+			<view class="list-item">
+				
+			</view>
+		</view>
+		
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+		},
+		data() {
+			return {
+				list: [
+					{
+						a: 1
+					},
+					{
+						a: 1
+					},
+					{
+						a: 1
+					},
+				],
+			}
+		},
+		methods: {
+			
+		},
+		mounted() {
+		},
+		components: {
+		}
+	}
+</script>
+
+<style lang="scss">
+	.content {
+		flex: 1;
+	}
+	
+</style>

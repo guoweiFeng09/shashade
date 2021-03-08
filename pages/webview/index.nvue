@@ -1,0 +1,34 @@
+<template>
+	<view class="container">
+		<web-view :style="{height: height + 'px'}" :webview-styles="webviewStyles" src="http://static-321867fe-4c25-4a3d-9f1f-018855bc5a44.bspapp.com/snow/index.html"></web-view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				height: '',
+				webviewStyles: {
+					progress: {
+						color: '#add8e6',
+						
+					}
+				}
+			}
+		},
+		onLoad() {
+			this.height = uni.getSystemInfoSync().windowHeight
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style lang="scss">
+	.web-view {
+		width: 750px;
+		height: 100%;
+	}
+</style>

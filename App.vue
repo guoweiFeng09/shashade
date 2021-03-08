@@ -4,47 +4,60 @@
 			console.log('App Launch');
 			// #ifdef APP-NVUE
 			plus.screen.lockOrientation('portrait-primary');
-
-			let appid = plus.runtime.appid;
-			if (appid && appid.toLocaleLowerCase() != "hbuilder") {
-				uni.request({
-					url: 'https://uniapp.dcloud.io/update', //检查更新的服务器地址
-					data: {
-						appid: plus.runtime.appid,
-						version: plus.runtime.version
-					},
-					success: (res) => {
-						console.log('success', res);
-						if (res.statusCode == 200 && res.data.isUpdate) {
-							let openUrl = plus.os.name === 'iOS' ? res.data.iOS : res.data.Android;
-							// 提醒用户更新
-							uni.showModal({
-								title: '更新提示',
-								content: res.data.note ? res.data.note : '是否选择更新',
-								success: (showResult) => {
-									if (showResult.confirm) {
-										plus.runtime.openURL(openUrl);
-									}
-								}
-							})
-						}
-					}
-				})
-			}
-
-			var domModule = weex.requireModule('dom');
-			domModule.addRule('fontFace', {
-				'fontFamily': "texticons",
-				'src': "url('./static/text-icon.ttf')"
-			});
 			// #endif
+			
+			
+			
 		},
 		onShow: function() {
 			console.log('App Show')
+			// 检测密码
+			uniCloud.callFunction({
+			    name: 'first',
+			    data: { 
+					url: 'getPassword'
+				}
+			}).then(res => {
+				const { data } = res.result
+				const loginPwd = uni.getStorageSync('loginPwd') || ''
+				uni.setStorageSync('cloudLoginPwd', data)
+				if(data !== loginPwd) {
+					uni.removeStorageSync('loginPwd')
+					
+					// 登录页面 不提示
+					var pages = getCurrentPages()
+					var page = (pages[pages.length - 1]).route
+					if(page == 'pages/login/login') return
+					
+					!uni.isShowModal && uni.showModal({
+					    title: '提示',
+					    content: loginPwd 
+							? '登录失效或密码错误，请重新登录'
+							: '大人请先登录哦',
+						showCancel: false,
+					    success:  res => {
+					        if (res.confirm) {
+							    uni.reLaunch({
+									url: '/pages/login/login'
+							    })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消')
+					        }
+							uni.isShowModal = false
+					    }
+					})
+					uni.isShowModal = true
+					
+				}
+				
+			}).catch(err => {
+				console.log('err', err)  
+			})
+			
 		},
 		onHide: function() {
 			console.log('App Hide')
-		}
+		},
 	}
 </script>
 
