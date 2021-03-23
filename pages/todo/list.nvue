@@ -1,11 +1,28 @@
 <template>
-	<view class="content">
-		<view class="list">
-			<view class="list-item">
-				
+	<view class="content" :class="[list.length ? 'bg1' : 'bg2']" v-if="isLoad">
+		<scroll-view class="list" scroll-y="true" :show-scrollbar="false" v-if="list.length">
+			<view class="list-item" v-for="(item, index) in list" :key="index">
+				<view class="list-done-flag" @click.stop="todoDone(item, index)">
+					<view class="list-done-wrap">
+						<image class="list-done-circle" src="/static/todo/done.jpg" mode="" v-if="item.done"></image>
+						<!-- <view class="list-done-mask"></view> -->
+					</view>
+				</view>
+				<view class="list-content" @click="gotoTodoEdit(item)">
+					<view class="list-content-top">{{item.title}}</view>
+					<view class="list-content-bottom">
+						<text class="list-content-bottom-time">{{item.time}}</text>
+						<text class="list-content-bottom-content">{{item.content}}</text>
+					</view>
+				</view>
 			</view>
+		</scroll-view>
+		<view class="no-data-wrap" v-else>
+			<image class="no-data" src="/static/todo/nodata.jpg" mode=""></image>
 		</view>
-		
+		<!-- <view class="btn" @click="gotoTodoEdit">
+			<text class="btn-text">添加</text>
+		</view> -->
 	</view>
 </template>
 
@@ -15,32 +32,235 @@
 		},
 		data() {
 			return {
-				list: [
-					{
-						a: 1
-					},
-					{
-						a: 1
-					},
-					{
-						a: 1
-					},
-				],
+				list: [],
+				isLoad: false
 			}
 		},
 		methods: {
-			
+			gotoTodoEdit(item) {
+				const id = (item && item.id) || ''
+				uni.navigateTo({
+					url: `/pages/todo/edit?id=${id}`,
+				})
+			},
+			gotoTodoHistory() {
+				uni.navigateTo({
+					url: '/pages/todo/history',
+				})
+			},
+			getList(noLoading) {
+				!noLoading && uni.showLoading()
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'getTodoList'
+					}
+				}).then(res => {
+					const resData = res.result
+					if(resData.code == 0) {
+						this.list = resData.data
+						this.isLoad = true
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+						this.isLoad = true
+					}
+					// const {lastVerson, downloadUrl} = res.result
+					uni.hideLoading()
+					uni.stopPullDownRefresh()
+				}).catch(err => {
+					console.log('err', err)  
+					uni.hideLoading()
+					this.isLoad = true
+					uni.stopPullDownRefresh()
+				})
+			},
+			todoDone(item, index) {
+				if(item.done) return
+				uni.showModal({
+				    title: '提示',
+				    content: '是不是确定完成呀？',
+				    success:  res => {
+				        if (res.confirm) {
+				            item.done = 1
+				            setTimeout(() => {
+				            	uniCloud.callFunction({
+				            	    name: 'first',
+				            	    data: { 
+				            			url: 'updateTodoItemComplete',
+				            			data: {
+				            				id: item.id
+				            			}
+				            		}
+				            	}).then(res => {
+				            		const resData = res.result
+				            		if(resData.code == 0) {
+				            			this.getList(1)
+				            		}else {
+				            			uni.showSToast('网络错误,请稍后再试')
+				            		}
+				            	}).catch(err => {
+				            		console.log('err', err) 
+				            	})
+				            }, 1000)
+				        } else if (res.cancel) {
+				            console.log('用户点击取消')
+				        }
+				    }
+				})
+				
+				
+				// uni.showLoading()
+				
+			}
 		},
 		mounted() {
+			// this.getList()
+		},
+		onShow() {
+			this.getList()
 		},
 		components: {
-		}
+		},
+		onNavigationBarButtonTap(e) {  
+			if(e.index == 0) {
+				this.gotoTodoEdit()
+			}else if(e.index == 1) {
+				this.gotoTodoHistory()
+			}
+			
+			console.log("点击了自定义按钮", e.index)
+		},
+		onPullDownRefresh() {
+			console.log("onPullDownRefreshonPullDownRefresh");
+			this.getList()
+			
+		},
 	}
 </script>
 
 <style lang="scss">
 	.content {
 		flex: 1;
+		background-color: #fff;
+		padding-left: 20rpx;
+		padding-right: 20rpx;
+		padding-top: 6rpx;
+		padding-bottom: 30rpx;
+		align-items: center;
+	}
+	.bg1 {
+		background-color: #f1f0f5;
+	}
+	.bg2 {
+		background-color: #fff;
+	}
+	.list {
+		flex: 1;
+		width: 690rpx;
+		// flex-direction: row;
+		// justify-content: flex-end;
+		
+		&-item {
+			height: 160rpx;
+			width: 690rpx;
+			padding-left: 30rpx;
+			// border-bottom: 1rpx #ececec solid;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			padding-top: 10rpx;
+			padding-bottom: 10rpx;
+			margin-top: 18rpx;
+			border-radius: 16rpx;
+			background-color: #fff;
+			// background-color: #ff0;
+		}
+		&-done{
+			&-flag {
+				height: 120rpx;
+				width: 80rpx;
+				// display: flex;
+				justify-content: center;
+				// align-items: center;
+			}
+			&-wrap {
+				position: relative;
+				height: 50rpx;
+				width: 50rpx;
+				border-radius: 50%;
+				border: 1rpx solid #d9c48f;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			&-circle {
+				height: 36rpx;
+				width: 36rpx;
+				border-radius: 50%;
+			}
+			&-mask {
+				position: absolute;
+				top: 2rpx;
+				left: 30rpx;
+				height: 44rpx;
+				width: 44rpx;
+				border-radius: 50%;
+				background-color: #fff;
+			}
+			
+		}
+		&-content {
+			flex: 1;
+			flex-direction: column;
+			&-top {
+				color: #000000;
+				font-size: 28rpx;
+			}
+			&-bottom {
+				margin-top: 10rpx;
+				
+				flex-direction: row;
+				align-items: center;
+				&-time {
+					margin-right: 20rpx;
+					color: #999;
+					font-size: 30rpx;
+				}
+				&-content {
+					margin-right: 6rpx;
+					color: #999;
+					font-size: 26rpx;
+					text-overflow: ellipsis;
+					width: 400rpx;
+					lines: 1;
+				}
+			}
+			
+			
+		}
+	}
+	.no-data-wrap {
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+	}
+	.no-data {
+		width: 333rpx;
+		height: 392rpx;
+	}
+	.btn {
+		margin-top: 20rpx;
+		margin-bottom: 20rpx;
+		width: 690rpx;
+		height: 90rpx;
+		align-items: center;
+		justify-content: center;
+		background-color: #d9c48f;
+		border-radius: 8rpx;
+		&-text {
+			color: #fff;
+			
+		}
 	}
 	
 </style>

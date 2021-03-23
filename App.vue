@@ -6,7 +6,14 @@
 			plus.screen.lockOrientation('portrait-primary');
 			// #endif
 			
-			
+			uni.getSystemInfo({
+				success(info) {
+					// console.log('------------getSystemInfo----------', JSON.stringify(info));
+					// console.log(JSON.stringify(info));
+					// nvue 使用
+					uni.setStorageSync('systemInfo', info)
+				}	
+			})
 			
 		},
 		onShow: function() {

@@ -1,0 +1,236 @@
+<template>
+	<view class="content">
+		<view class="time">
+			<text>计划时间</text>
+			<view class="uni-list-cell-db">
+				<picker mode="date" :value="time"  @change="bindDateChange">
+					<view class="picker-inner">
+						<text class="date-text">{{time}}</text>
+						<image class="date-icon" src="/static/todo/date.jpg" mode=""></image>
+					</view>
+				</picker>
+			</view>
+		</view>
+		<input class="uni-input" focus placeholder="大人请输入标题" v-model="title"/>
+		<textarea class="uni-textarea" @blur="bindTextAreaBlur" placeholder="大人请输入内容" v-model="content"/>
+		
+		<view class="btn" @click="btnComfirm">
+			<text class="btn-text">保存</text>
+		</view>
+	</view>
+</template>
+
+<script>
+	import { timeFormat } from '@/utils/tool.js'
+	export default {
+		props: {
+		},
+		data() {
+			return {
+				pageType: 0,
+				itemId: '',
+				time: '',
+				title: '',
+				content: '',
+			}
+		},
+		computed: {
+			
+		},
+		methods: {
+			bindDateChange(e) {
+				console.log('e', e.detail.value)
+				this.time = e.detail.value
+			},
+			getItem(id) {
+				console.log('checkUpdate', id)
+				uni.showLoading()
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'getTodoItem',
+						data: {
+							id
+						}
+					}
+				}).then(res => {
+					uni.hideLoading()
+					const resData = res.result
+					
+					if(resData.code == 0) {
+						const target = resData.data && resData.data[0]
+						this.time = target.time
+						this.title = target.title
+						this.content = target.content
+						
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+					}
+					
+				}).catch(err => {
+					uni.hideLoading()
+					console.log('err', err)  
+				})
+			},
+			btnComfirm() {
+				if(!this.time) {
+					uni.showSToast('请选择时间')
+					return
+				}
+				if(!this.title) {
+					uni.showSToast('请输入标题')
+					return
+				}
+				if(!this.content) {
+					uni.showSToast('请输入内容')
+					return
+				}
+				this.itemId ? this.update() : this.add()
+			},
+			update() {
+				console.log('checkUpdate')
+				const params = {
+					id: this.itemId,
+					time: this.time,
+					title: this.title,
+					content: this.content,
+				}
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'updateTodoItem',
+						data: params
+					}
+				}).then(res => {
+					console.log('resData', res)  
+					const resData = res.result
+					if(resData.code == 0) {
+						uni.showSToast('保存成功')
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 1500)
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+					}
+					
+				}).catch(err => {
+					console.log('err', err)  
+				})
+			},
+			add() {
+				const params = {
+					time: this.time,
+					title: this.title,
+					content: this.content,
+				}
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'addTodoItem',
+						data: params
+					}
+				}).then(res => {
+					console.log('resData', res) 
+					const resData = res.result
+					if(resData.code == 0) {
+						uni.showSToast('添加成功')
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 1500)
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+					}
+					
+				}).catch(err => {
+					console.log('err', err)  
+				})
+				
+			}
+		},
+		onLoad(e) {
+			if(e.id) {
+				this.pageType = 1
+				this.itemId = e.id
+				this.getItem(this.itemId)
+			}else {
+				const now = new Date()
+				this.time = timeFormat(now, 'yyyy-MM-dd')
+			}
+		},
+		components: {
+		},
+	}
+</script>
+
+<style lang="scss">
+	.content {
+		flex: 1;
+		background-color: #f1f0f5;
+		align-items: center;
+	}
+	.time {
+		width: 750rpx;
+		height: 100rpx;
+		padding-left: 50rpx;
+		padding-right: 50rpx;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.picker-inner {
+		flex-direction: row;
+		align-items: center;
+	}
+	.date-text {
+		// font-size: 26rpx;
+		// width: 300rpx;
+		margin-right: 14rpx;
+		flex-direction: row;
+		justify-content: flex-end;
+		color: #d9c48f;
+	}
+	.date-icon {
+		width: 48rpx;
+		height: 48rpx;
+	}
+	.uni-input {
+		width: 650rpx;
+		height: 70rpx;
+		// border: 1rpx solid #999;
+		background-color: #fff;
+		border-radius: 8rpx;
+		padding-left: 10rpx;
+		padding-right: 10rpx;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+		font-size: 28rpx;
+	}
+	.uni-textarea {
+		margin-top: 16rpx;
+		width: 650rpx;
+		background-color: #fff;
+		height: 480rpx;
+		border-radius: 8rpx;
+		// border: 1rpx solid #999;
+		padding-left: 10rpx;
+		padding-right: 10rpx;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+		font-size: 24rpx;
+	}
+	.btn {
+		margin-top: 50rpx;
+		width: 650rpx;
+		height: 90rpx;
+		align-items: center;
+		justify-content: center;
+		background-color: #d9c48f;
+		border-radius: 8rpx;
+		&-text {
+			color: #fff;
+			
+		}
+	}
+	
+	
+</style>

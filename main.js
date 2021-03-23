@@ -3,9 +3,7 @@ import App from './App'
 
 Vue.config.productionTip = false
 
-uni.appVersion = '1.0.1'
-
-Vue.prototype.$host = 'https://unidemo.dcloud.net.cn/';
+uni.appVersion = '1.0.2'
 
 App.mpType = 'app'
 

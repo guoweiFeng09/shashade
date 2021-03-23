@@ -16,7 +16,7 @@
 				</view>
 			</view>
 			<image class="time-wrap-avatar" src="/static/index/avatar2.jpg" mode=""></image>
-			<image class="time-wrap-avatar time-wrap-me" src="/static/index/avatar1.jpg" mode=""></image>
+			<image class="time-wrap-avatar time-wrap-me" src="/static/index/avatar1.jpg" mode="" ref="avatar1"></image>
 		</view>
 		<view class="list">
 			<view class="list-line">
@@ -24,8 +24,15 @@
 					<image class="list-item-image" src="/static/index/snow.jpg" mode=""></image>
 					<text class="list-item-text">下雪啦</text>
 				</view>
-				<!-- <view class="list-item" @click="gotoTodoList"> -->
+				<view class="list-item" @click="gotoTodoList">
+				<!-- <view class="list-item"> -->
+					<image class="list-item-image" src="/static/index/todo.jpg" mode=""></image>
+					<!-- <text>期待~</text> -->
+				</view>
+			</view>
+			<view class="list-line">
 				<view class="list-item">
+				<!-- <view class="list-item"> -->
 					<image class="list-item-image" src="/static/index/wait.jpg" mode=""></image>
 					<!-- <text>期待~</text> -->
 				</view>
@@ -35,9 +42,8 @@
 </template>
 
 <script>
-	// #ifdef APP-PLUS
-	const dom = weex.requireModule('dom');
-	// #endif
+	const animation = weex.requireModule('animation')
+	const dom = weex.requireModule('dom')
 	import { timeFormat, DateDiff } from '@/utils/tool.js'
 	
 	export default {
@@ -67,7 +73,12 @@
 				this.time = timeFormat(now, 'hh:mm:ss')
 				this.getDays()
 				// console.log('timeFormat', this.time)
+				
 			}, 1000)
+			
+			this.move()
+			
+			
 		},
 		beforeCreate() {
 			const domModule = uni.requireNativePlugin('dom')
@@ -134,7 +145,7 @@
 			},
 			gotoTodoList() {
 				uni.navigateTo({
-					url: '/pages/todo/list'
+					url: '/pages/todo/list',
 				})
 			},
 			getDays() {
@@ -143,6 +154,24 @@
 			previewImage(url) {
 				uni.previewImage({
 					urls: [url]
+				})
+			},
+			move () {
+				// const systemInfo = uni.getStorageSync('systemInfo') || {}
+				// const windowWidth = systemInfo.windowWidth
+				// const windowHeight = systemInfo.windowHeight
+				
+				// console.log('systemInfo', systemInfo)
+				const el = this.$refs.avatar1
+				animation.transition(el, {
+				  styles: {
+					transform: 'rotate(36000000deg)',
+					transformOrigin: 'center center'
+				  },
+				  duration: 999999999, //ms
+				  timingFunction: 'linear',
+				  delay: 0 //ms
+				},  () => {
 				})
 			},
 			
@@ -161,12 +190,15 @@
 	.tabs {
 		background-color: #aecfff; 
 		background-image: linear-gradient(to bottom, #999, #fff);
-		flex:1;  
+		// flex:1;  
 		align-items: center;
 	}
 	.swiper {
 		width: 750rpx;
 		height: 400rpx;
+	}
+	.swiper-image {
+		width: 750rpx;
 	}
 	.clock {
 		width: 400rpx;
@@ -224,6 +256,7 @@
 		width: 750rpx;
 		// align-items: center;
 		&-line {
+			margin-bottom: 30rpx;
 			flex-direction: row;
 			justify-content: space-between;
 		}

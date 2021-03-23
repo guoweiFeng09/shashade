@@ -2,8 +2,8 @@
     "name" : "傻傻的",
     "appid" : "__UNI__3F643B5",
     "description" : "私人app（非商用）",
-    "versionName" : "1.0.0",
-    "versionCode" : 100,
+    "versionName" : "1.0.2",
+    "versionCode" : 102,
     "transformPx" : false,
     "uniStatistics" : {
         "enable" : true
