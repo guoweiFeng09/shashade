@@ -15,6 +15,21 @@
 				}	
 			})
 			
+			
+			console.log('plus.push.getClientInfo()', plus.push.getClientInfo())
+			
+			plus.push.addEventListener('click', function(msg){
+				// 分析msg.payload处理业务逻辑 
+				console.log( 'You clicked: ' + msg.content );
+			}, false );
+			
+			plus.push.addEventListener('receive', function(msg){
+				// 分析msg.payload处理业务逻辑 
+				console.log( 'You receive: ' + msg.content );
+			}, false );
+			
+			
+			
 		},
 		onShow: function() {
 			console.log('App Show')

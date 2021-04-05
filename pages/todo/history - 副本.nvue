@@ -1,0 +1,252 @@
+<template>
+	<view class="content" :class="[list.length ? 'bg1' : 'bg2']" v-if="isLoad">
+		<scroll-view class="list" scroll-y="true" :show-scrollbar="false" v-if="list.length">
+			<view class="list-item" v-for="(item, index) in list" :key="index" @touchstart="move" ref="avatar1">
+				<view class="list-content">
+					<view class="list-content-top">{{item.title}}</view>
+					<view class="list-content-bottom">
+						<text class="list-content-bottom-time">{{item.time}}</text>
+						<text class="list-content-bottom-content">{{item.content}}</text>
+					</view>
+				</view>
+				<view class="list-done-flag">
+					<image class="list-done-circle" src="/static/todo/done2.jpeg" mode=""></image>
+				</view>
+				<text class="list-complete-time">{{item.completeTime}}</text>
+			</view>
+		</scroll-view>
+		<view class="no-data-wrap" v-else>
+			<image class="no-data" src="/static/todo/nodata.jpg" mode=""></image>
+		</view>
+	</view>
+</template>
+
+<script>
+	const BindingX = uni.requireNativePlugin('bindingx')
+	export default {
+		props: {
+		},
+		data() {
+			return {
+				list: [],
+				isLoad: false
+			}
+		},
+		methods: {
+			getList(noLoading) {
+				!noLoading && uni.showLoading()
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'getTodoListDone'
+					}
+				}).then(res => {
+					const resData = res.result
+					if(resData.code == 0) {
+						this.list = resData.data
+						this.isLoad = true
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+						this.isLoad = true
+					}
+					// const {lastVerson, downloadUrl} = res.result
+					uni.hideLoading()
+					uni.stopPullDownRefresh()
+				}).catch(err => {
+					console.log('err', err)  
+					uni.hideLoading()
+					this.isLoad = true
+					uni.stopPullDownRefresh()
+				})
+			},
+			
+			getEl: function(el) {
+				if (typeof el === 'string' || typeof el === 'number') return el;
+				if (WXEnvironment) {
+					return el.ref;
+				} else {
+					return el instanceof HTMLElement ? el : el.$el;
+				}
+			},
+			move() {
+				const　el = this.getEl(this.$refs.avatar1[0])
+				const props = [
+					{
+						element: el,
+						expression: `x+100`,
+						property: 'transform.translateX'
+					},
+					{
+						element: el,
+						expression: `y+0`,
+						property: 'transform.translateY'
+					}
+				]
+				BindingX.bind(
+					{
+						eventType: 'pan',
+						anchor: el,
+						exitExpression: '',
+						props
+					},
+					e => {
+						// nope
+						console.log(e);
+						if (e.state == 'end') {
+							console.log('end');
+						}
+					}
+				)
+			}
+		},
+		mounted() {
+			this.getList()
+		},
+		
+		components: {
+		},
+		
+		onPullDownRefresh() {
+			this.getList()
+		},
+	}
+</script>
+
+<style lang="scss">
+	.content {
+		flex: 1;
+		background-color: #fff;
+		padding-left: 20rpx;
+		padding-right: 20rpx;
+		padding-top: 6rpx;
+		padding-bottom: 30rpx;
+		align-items: center;
+	}
+	.bg1 {
+		background-color: #f1f0f5;
+	}
+	.bg2 {
+		background-color: #fff;
+	}
+	.list {
+		flex: 1;
+		width: 690rpx;
+		// flex-direction: row;
+		// justify-content: flex-end;
+		
+		&-item {
+			position: relative;
+			height: 160rpx;
+			width: 690rpx;
+			padding-left: 30rpx;
+			// border-bottom: 1rpx #ececec solid;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			padding-top: 10rpx;
+			padding-bottom: 10rpx;
+			margin-top: 18rpx;
+			border-radius: 16rpx;
+			background-color: #fff;
+			// background-color: #ff0;
+		}
+		&-done{
+			&-flag {
+				height: 160rpx;
+				width: 160rpx;
+				// display: flex;
+				justify-content: center;
+				align-items: flex-end;
+			}
+			// &-wrap {
+			// 	position: relative;
+			// 	height: 50rpx;
+			// 	width: 50rpx;
+			// 	border-radius: 50%;
+			// 	border: 1rpx solid #d9c48f;
+			// 	display: flex;
+			// 	align-items: center;
+			// 	justify-content: center;
+			// }
+			&-circle {
+				height: 120rpx;
+				width: 120rpx;
+				// border-radius: 50%;
+			}
+			&-mask {
+				position: absolute;
+				top: 2rpx;
+				left: 30rpx;
+				height: 44rpx;
+				width: 44rpx;
+				border-radius: 50%;
+				background-color: #fff;
+			}
+			
+		}
+		&-content {
+			flex: 1;
+			flex-direction: column;
+			&-top {
+				color: #000000;
+				font-size: 28rpx;
+			}
+			&-bottom {
+				margin-top: 10rpx;
+				
+				flex-direction: row;
+				align-items: center;
+				&-time {
+					margin-right: 20rpx;
+					color: #999;
+					font-size: 30rpx;
+				}
+				&-content {
+					margin-right: 6rpx;
+					color: #999;
+					font-size: 26rpx;
+					text-overflow: ellipsis;
+					width: 400rpx;
+					lines: 1;
+				}
+			}
+			
+			
+		}
+		
+		&-complete-time {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background-color: #d9c48f;
+			color: #fff;
+			font-size: 24rpx;
+			padding: 4rpx 6rpx;
+			border-radius: 4rpx;
+		}
+	}
+	.no-data-wrap {
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+	}
+	.no-data {
+		width: 333rpx;
+		height: 392rpx;
+	}
+	.btn {
+		margin-top: 20rpx;
+		margin-bottom: 20rpx;
+		width: 690rpx;
+		height: 90rpx;
+		align-items: center;
+		justify-content: center;
+		background-color: #d9c48f;
+		border-radius: 8rpx;
+		&-text {
+			color: #fff;
+			
+		}
+	}
+	
+</style>

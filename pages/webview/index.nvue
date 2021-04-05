@@ -12,16 +12,32 @@
 				webviewStyles: {
 					progress: {
 						color: '#add8e6',
-						
 					}
-				}
+				},
+				audio: null
 			}
 		},
 		onLoad() {
 			this.height = uni.getSystemInfoSync().windowHeight
+			this.playMusic()
+			
+		},
+		beforeDestroy() {
+			this.audio.destroy()
 		},
 		methods: {
-			
+			playMusic() {
+				this.audio = uni.createInnerAudioContext()
+				this.audio.autoplay = true
+				this.audio.loop = true
+				this.audio.src = '/static/music/xingguang.mp3'
+				this.audio.onPlay(() => {
+				  console.log('开始播放')
+				})
+				this.audio.onError((res) => {
+				  console.log(res)
+				})
+			}
 		}
 	}
 </script>

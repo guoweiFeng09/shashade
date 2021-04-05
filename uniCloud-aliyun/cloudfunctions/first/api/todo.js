@@ -49,6 +49,7 @@ async function add(db, data) {
 	const isSuceess = dbData.id
 	const res = isSuceess ? successRes : failRes
 	console.log('add', data, dbData)
+	todoUpdatePush() //更新推送
 	return res
 }
 
@@ -65,8 +66,11 @@ async function update(db, data) {
 	const { id } = data
 	const dbData = await db.collection(collection).where({id}).update(data)
 	const isSuceess = dbData.affectedDocs
-	const res = isSuceess ? successRes : failRes
+	// const res = isSuceess ? successRes : failRes
+	const res = successRes
+	
 	console.log('update', data, dbData, res)
+	todoUpdatePush() //更新推送
 	return res
 }
 
@@ -79,6 +83,7 @@ async function updateTodoItemComplete(db, data) {
 	const isSuceess = dbData.affectedDocs
 	const res = isSuceess ? successRes : failRes
 	console.log('update', data, dbData, res)
+	todoUpdatePush() //更新推送
 	return res
 }
 
@@ -122,3 +127,9 @@ async function getById(db, data) {
 	
 	return res
 }
+
+function todoUpdatePush() {
+	uniCloud.callFunction({name: "todoUpdatePush"})
+}
+
+

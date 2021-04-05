@@ -15,6 +15,8 @@
 						<text class="list-content-bottom-content">{{item.content}}</text>
 					</view>
 				</view>
+				<image class="list-item-expired-gif" src="/static/todo/expired.gif" mode="" v-if="item.isExpiredWarning"></image>
+				<!-- <image class="list-item-expired-gif" src="/static/todo/done.jpg" mode=""></image> -->
 			</view>
 		</scroll-view>
 		<view class="no-data-wrap" v-else>
@@ -58,6 +60,8 @@
 				}).then(res => {
 					const resData = res.result
 					if(resData.code == 0) {
+						// 检测到期，进行警告
+						this.expiredWran(resData.data)
 						this.list = resData.data
 						this.isLoad = true
 					}else {
@@ -72,6 +76,14 @@
 					uni.hideLoading()
 					this.isLoad = true
 					uni.stopPullDownRefresh()
+				})
+			},
+			expiredWran(list) {
+				list = list || []
+				// 距过期时间 天数
+				const expiredDistance = 3600 * 24 * 1000 *  7 // 7-天数
+				list.forEach(item => {
+					item.isExpiredWarning = new Date(item.time).getTime() - new Date().getTime() < expiredDistance
 				})
 			},
 			todoDone(item, index) {
@@ -161,6 +173,7 @@
 		// justify-content: flex-end;
 		
 		&-item {
+			position: relative;
 			height: 160rpx;
 			width: 690rpx;
 			padding-left: 30rpx;
@@ -174,6 +187,14 @@
 			border-radius: 16rpx;
 			background-color: #fff;
 			// background-color: #ff0;
+			
+			&-expired-gif {
+				position: absolute;
+				right: 0;
+				top: 0;
+				width: 80rpx;
+				height: 80rpx;
+			}
 		}
 		&-done{
 			&-flag {
