@@ -24,11 +24,12 @@ module.exports = async () => {
 			content,
 			data:{
 				type: 1,
+				t: new Date().getTime()
 				// content: pushArr,
 			},
 			payload:{
 				type: 1,
-				t: new Date().getTime()
+				// t: new Date().getTime()
 			}
 		}),
 		// clientid:'2bea043336c3e3f8c00bdac8b55c0c5a'

@@ -1,7 +1,9 @@
 <template>
 	<view class="tabs">
 		<view class="bg"></view>
-		<view class="box" ref="avatarWrap"  @touchstart="move"></view>
+		<view class="move-box" :class="[isStopWalk? 'move-box-stop-walk' : '']" :style="{left: position.initX + 'px', top: position.initY + 'px'}" ref="avatarWrap" @touchstart="touchmove">
+			<image class="move-box-img" src="/static/index/avatar1.jpg" mode="" ref="ssd" @touchstart="avatarMove"></image>
+		</view>
 		 <swiper class="swiper" :indicator-dots="true" autoplay :interval="5000" :duration="1000" circular >
 			<swiper-item class="swiper-item" v-for="item in swiperUrl">
 				<image class="swiper-image" :src="item" mode="" @click="previewImage(item)"></image>
@@ -16,9 +18,9 @@
 					<text class="time-right-time LcdD">{{time}}</text>
 				</view>
 			</view>
-			<image class="time-wrap-avatar" src="/static/index/avatar2.jpg" mode=""></image>
+			<image class="time-wrap-avatar" src="/static/index/avatar2.jpg" mode="" @tap="avatarTop"></image>
 			<view class="time-wrap-avatar time-wrap-me" ref="avatar2">
-				<image class="time-wrap-me-img" src="/static/index/avatar1.jpg" mode="" ref="avatar1" @touchstart="avatarMove"></image>
+				<!-- <image class="time-wrap-me-img" src="/static/index/avatar1.jpg" mode="" ref="avatar1" @touchstart="avatarMove"></image> -->
 			</view>
 			<!-- <image class="time-wrap-avatar time-wrap-me" src="/static/index/avatar1.jpg" mode="" ref="avatar1" @touchstart="avatarMove"></image> -->
 		</view>
@@ -46,12 +48,11 @@
 </template>
 
 <script>
-	const animation = weex.requireModule('animation')
-	const dom = weex.requireModule('dom')
-	const BindingX = uni.requireNativePlugin('bindingx')
 	import { timeFormat, DateDiff } from '@/utils/tool.js'
+	import moveMixin from '@/pages/index/moveMixin'
 	
 	export default {
+		mixins: [moveMixin],
 		components: {
 		},
 		data() {
@@ -62,11 +63,6 @@
 					'/static/index/swiper3.jpg',
 					'/static/index/swiper4.jpg',
 				],
-				position: {
-					x: 0,
-					y: 0
-				},
-				moveGesToken: null,
 				bannerTimer: null,
 				day: 0,
 				date: '',
@@ -78,21 +74,22 @@
 		onReady() {
 			this.checkUpdate()
 			
-			this.avatarRotate()
+			this.initMoving()
 			
 		},
 		beforeCreate() {
-			const domModule = uni.requireNativePlugin('dom')
-			domModule.addRule('fontFace', {
-				'fontFamily': "fontLcdD",
-				'src': "url('https://vkceyugu.cdn.bspapp.com/VKCEYUGU-321867fe-4c25-4a3d-9f1f-018855bc5a44/cfb9ccab-061e-4774-921d-70bde7276d7d.ttf')"
-			});
+			// const domModule = uni.requireNativePlugin('dom')
+			// domModule.addRule('fontFace', {
+			// 	'fontFamily': "fontLcdD",
+			// 	'src': "url('https://vkceyugu.cdn.bspapp.com/VKCEYUGU-321867fe-4c25-4a3d-9f1f-018855bc5a44/cfb9ccab-061e-4774-921d-70bde7276d7d.ttf')"
+			// });
 		},
 		onShow(e) {
 			console.log('index onShow')
 			this.starBannerTimer()
 			// 清除角标
 			plus.runtime.setBadgeNumber(0)
+
 		},
 		onHide() {
 			console.log('index onHide')
@@ -197,93 +194,7 @@
 					urls: [url]
 				})
 			},
-			avatarRotate () {
-				// const systemInfo = uni.getStorageSync('systemInfo') || {}
-				// const windowWidth = systemInfo.windowWidth
-				// const windowHeight = systemInfo.windowHeight
-				
-				// console.log('systemInfo', systemInfo)
-				const el = this.$refs.avatar1
-				animation.transition(el, {
-				  styles: {
-					transform: 'rotate(36000000deg)',
-					transformOrigin: 'center center'
-				  },
-				  duration: 999999999, //ms
-				  timingFunction: 'linear',
-				  delay: 0 //ms
-				},  () => {
-				})
-			},
 			
-			getEl: function(el) {
-				if (typeof el === 'string' || typeof el === 'number') return el;
-				if (WXEnvironment) {
-					return el.ref;
-				} else {
-					return el instanceof HTMLElement ? el : el.$el;
-				}
-			},
-			move() {
-				console.log('this.$refs', this.$refs.avatarWrap)
-				const　el = this.getEl(this.$refs.avatarWrap)
-				const　avatar2 = this.getEl(this.$refs.avatar2)
-				
-				
-				const props = [
-					{
-						element: el,
-						expression: `x+${this.position.x}`,
-						property: 'transform.translateX'
-					},
-					{
-						element: el,
-						expression: `y+${this.position.y}`,
-						property: 'transform.translateY'
-					},
-					{
-						element: avatar2,
-						expression: `x+${this.position.x}`,
-						property: 'transform.translateX'
-					},
-					{
-						element: avatar2,
-						expression: `y+${this.position.y}`,
-						property: 'transform.translateY'
-					},
-					
-					// {
-					// 	element: el,
-					// 	property: 'transform.translateX',
-					// 	expression: "linear(t,0,200,4000)"
-					// },
-					// {
-					// 	element: el,
-					// 	property: 'transform.translateY',
-					// 	expression: "linear(t,0,60,4000)"
-					// }
-				]
-				BindingX.bind(
-					{
-						eventType: 'pan',
-						anchor: el, 
-						exitExpression: '',
-						// eventType: 'timing',
-						// exitExpression: 't>5000',
-						props
-					},
-					e => {
-						// nope
-						// console.log(e);
-						if (e.state == 'end') {
-							this.position.x += e.deltaX
-							this.position.y += e.deltaY
-							this.moveGesToken = e.token
-							console.log('end', e);
-						}
-					}
-				)
-			}
 		}
 	}
 </script>
@@ -301,13 +212,26 @@
 		// flex:1;  
 		align-items: center;
 	}
-	.box {
+	.move-box {
 		position: fixed;
 		// top: 0;
 		// left: 0;
 		width: 100rpx;
 		height: 100rpx;
-		background-color: black;
+		border: 4rpx #0b822c solid;
+		border-radius: 50%;
+		justify-content: center;
+		align-items: center;
+		// background-color: black;
+		&-stop-walk {
+			border: 4rpx #666 solid;
+		}
+		&-img {
+			width: 96rpx;
+			height: 96rpx;
+			border-radius: 50%;
+			
+		}
 	}
 	.swiper {
 		width: 750rpx;
@@ -336,7 +260,7 @@
 		}
 		&-me {
 			left: 110rpx;
-			background-color: #FF0000;
+			// background-color: #FF0000;
 			&-img {
 				width: 100rpx;
 				height: 100rpx;

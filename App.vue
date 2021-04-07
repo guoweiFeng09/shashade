@@ -20,12 +20,12 @@
 			
 			plus.push.addEventListener('click', function(msg){
 				// 分析msg.payload处理业务逻辑 
-				console.log( 'You clicked: ' + msg.content );
+				console.log( 'You clicked: ', msg);
 			}, false );
 			
 			plus.push.addEventListener('receive', function(msg){
 				// 分析msg.payload处理业务逻辑 
-				console.log( 'You receive: ' + msg.content );
+				console.log( 'You receive: ', msg);
 			}, false );
 			
 			

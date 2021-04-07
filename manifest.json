@@ -9,7 +9,7 @@
         "enable" : true
     },
     "app-plus" : {
-		"runmode": "liberate",
+        "runmode" : "liberate",
         "usingComponents" : true,
         "nvueCompiler" : "uni-app",
         "nvueStyleCompiler" : "uni-app",
