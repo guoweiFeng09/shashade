@@ -14,7 +14,8 @@ export default {
 			isInAnimation: false,
 			randomMoveTimer: null,
 			doubleClick: {
-				lastTimeStamp: 0
+				lastTimeStamp: 0,
+				isJudge: false
 			},
 			isStopWalk: false
 		}
@@ -39,10 +40,8 @@ export default {
 				dom.getComponentRect(el, (e) => {
 					this.position.initX = e.size.left
 					this.position.initY = e.size.top
-					
-					// this.randomMove()
 				})
-			}, 0)
+			}, 100)
 		},
 		
 		avatarRotate () {
@@ -81,9 +80,9 @@ export default {
 		
 		async shake() {
 			const el = this.getEl(this.$refs.avatarWrap)
-			await shakeFunction(el, 'linear(t,0,-5,50)', 50)
-			await shakeFunction(el, 'linear(t,-5,10,50)', 100)
-			await shakeFunction(el, 'linear(t,10,-10,50)', 50)
+			await shakeFunction(el, `linear(t,${this.position.x},-5,50)`, 50)
+			await shakeFunction(el, `linear(t,${this.position.x-5},10,50)`, 50)
+			await shakeFunction(el, `linear(t,${this.position.x+5},-5,50)`, 50)
 			
 			function shakeFunction(el, expression, duration) {
 				return new Promise((resolve, reject) => {
@@ -114,11 +113,17 @@ export default {
 			
 		},
 		isDoubleClick(e) {
+			if(this.isAvatarBacking) return
 			let isDouble = false
 			const now = e.timeStamp
-			if(now - this.doubleClick.lastTimeStamp < 600) {
+			if(!this.doubleClick.isJudging && (now - this.doubleClick.lastTimeStamp < 700)) {
 				isDouble = true
 				this.handleDoubleClick()
+				
+				this.doubleClick.isJudging = true
+				setTimeout(() => {
+					this.doubleClick.isJudging = false
+				}, 400)
 			}else {
 				isDouble = false
 			}
@@ -141,6 +146,9 @@ export default {
 			if(this.isRandomMoving) return		
 			if(this.isDoubleClick(e)) return
 			if(this.isInAnimation) return
+			
+			// 处理 短暂点击事件 影响到双击
+			const clickTimeStamp = new Date().getTime()
 			
 			this.isInAnimation = true
 			const el = this.getEl(this.$refs.avatarWrap)
@@ -168,8 +176,11 @@ export default {
 					if (e.state == 'end') {
 						this.position.x += e.deltaX
 						this.position.y += e.deltaY
-						this.back()
-						// this.isInAnimation = false
+						if(new Date().getTime() - clickTimeStamp > 200) {
+							this.back()
+						}else {
+							this.isInAnimation = false
+						}
 						if(result) {
 							BindingX.unbind({
 								token: result.token,
@@ -182,6 +193,7 @@ export default {
 		},
 		back() {
 			this.isInAnimation = true
+			this.isAvatarBacking = true
 			const el = this.getEl(this.$refs.avatarWrap)
 			
 			// 随机 过渡时间/timingFunction
@@ -218,7 +230,7 @@ export default {
 						this.position.x -= this.position.x
 						this.position.y -= this.position.y
 						this.isInAnimation = false
-						
+						this.isAvatarBacking = false
 					}
 				}
 			)

@@ -2,9 +2,9 @@
 	<view class="tabs">
 		<view class="bg"></view>
 		<view class="move-box" :class="[isStopWalk? 'move-box-stop-walk' : '']" :style="{left: position.initX + 'px', top: position.initY + 'px'}" ref="avatarWrap" @touchstart="touchmove">
-			<image class="move-box-img" src="/static/index/avatar1.jpg" mode="" ref="ssd" @touchstart="avatarMove"></image>
+			<image class="move-box-img" src="/static/index/avatar1.jpg" mode="" ref="ssd"></image>
 		</view>
-		 <swiper class="swiper" :indicator-dots="true" autoplay :interval="5000" :duration="1000" circular >
+		<swiper class="swiper" :indicator-dots="true" autoplay :interval="5000" :duration="1000" circular >
 			<swiper-item class="swiper-item" v-for="item in swiperUrl">
 				<image class="swiper-image" :src="item" mode="" @click="previewImage(item)"></image>
 			</swiper-item>
@@ -222,7 +222,6 @@
 		border-radius: 50%;
 		justify-content: center;
 		align-items: center;
-		// background-color: black;
 		&-stop-walk {
 			border: 4rpx #666 solid;
 		}
@@ -230,7 +229,6 @@
 			width: 96rpx;
 			height: 96rpx;
 			border-radius: 50%;
-			
 		}
 	}
 	.swiper {
