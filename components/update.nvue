@@ -1,0 +1,105 @@
+<template>
+	<view class="update">
+		<view class="update-body">
+			<view class="update-body-title">正在更新</view>
+			<text class="update-body-percent">{{progress}}%</text>
+			<view class="update-body-process">
+				<view class="update-body-process-inner" :style="{width: innerWidth + 'px'}"></view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		props: {
+		},
+		data() {
+			return {
+				progress: 0,
+				innerWidth: 0
+			}
+		},
+		methods: {
+			updateApp(url) {
+				const downloadTask = uni.downloadFile({  
+					url,  
+					success: (downloadResult) => {  
+						if (downloadResult.statusCode === 200) {  
+							plus.runtime.install(downloadResult.tempFilePath, {  
+								force: !false  
+							}, function() {  
+								console.log('install success...')
+								plus.runtime.restart()
+							}, function(e) {  
+								console.error('install fail...', e)
+							});  
+						}  
+					}  
+				}); 
+				
+				downloadTask.onProgressUpdate((res) => {
+					this.progress = res.progress
+					this.innerWidth = uni.upx2px(530) * res.progress / 100
+				})
+			},
+		},
+		mounted() {
+		},
+		
+		components: {
+		},
+	}
+</script>
+
+<style lang="scss">
+	.update {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.4);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&-body {
+			width: 630rpx;
+			height: 330rpx;
+			padding: 30rpx 50rpx;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			background-color: #fff;
+			&-title {
+				width: 530rpx;
+				font-size: 30rpx;
+				color: #464644;
+			}
+			&-percent {
+				margin-top: 60rpx;
+				margin-bottom: 18rpx;
+				font-size: 24rpx;
+				color: #656565;
+			}
+			&-process {
+				position: relative;
+				width: 530rpx;
+				height: 14rpx;
+				background-color: #eeeeec;
+				border-top: 1rpx solid #e2e2e2;
+				border-bottom: 1rpx solid #e2e2e2;
+				&-inner {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 0rpx;
+					height: 14rpx;
+					background-color: #f99328;
+				}
+				
+			}
+		}
+	}
+	
+</style>

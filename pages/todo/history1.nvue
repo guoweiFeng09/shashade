@@ -1,7 +1,7 @@
 <template>
 	<view class="content" :class="[list.length ? 'bg1' : 'bg2']" v-if="isLoad">
 		<scroll-view class="list" scroll-y="true" :show-scrollbar="false" v-if="list.length">
-			<view class="list-item" v-for="(item, index) in list" :key="index" @click="gotoTodoEdit(item)">
+			<view class="list-item" v-for="(item, index) in list" :key="index" @touchstart="move" ref="avatar1">
 				<view class="list-content">
 					<view class="list-content-top">{{item.title}}</view>
 					<view class="list-content-bottom">
@@ -59,12 +59,45 @@
 					uni.stopPullDownRefresh()
 				})
 			},
-			gotoTodoEdit(item) {
-				const id = (item && item.id) || ''
-				uni.navigateTo({
-					url: `/pages/todo/historyEdit?id=${id}&isHistory=1`,
-				})
+			
+			getEl: function(el) {
+				if (typeof el === 'string' || typeof el === 'number') return el;
+				if (WXEnvironment) {
+					return el.ref;
+				} else {
+					return el instanceof HTMLElement ? el : el.$el;
+				}
 			},
+			move() {
+				const　el = this.getEl(this.$refs.avatar1[0])
+				const props = [
+					{
+						element: el,
+						expression: `x+100`,
+						property: 'transform.translateX'
+					},
+					{
+						element: el,
+						expression: `y+0`,
+						property: 'transform.translateY'
+					}
+				]
+				BindingX.bind(
+					{
+						eventType: 'pan',
+						anchor: el,
+						exitExpression: '',
+						props
+					},
+					e => {
+						// nope
+						console.log(e);
+						if (e.state == 'end') {
+							console.log('end');
+						}
+					}
+				)
+			}
 		},
 		mounted() {
 			this.getList()

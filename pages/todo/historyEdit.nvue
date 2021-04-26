@@ -1,0 +1,136 @@
+<template>
+	<view class="content">
+		<view class="time">
+			<text>计划时间</text>
+			<view class="uni-list-cell-db">
+				<view class="picker-inner">
+					<text class="date-text">{{time}}</text>
+					<image class="date-icon" src="/static/todo/date.jpg" mode=""></image>
+				</view>
+			</view>
+		</view>
+		<view class="uni-input">{{title}}</view>
+		<view class="uni-textarea">{{content}}</view>
+	</view>
+</template>
+
+<script>
+	import { timeFormat } from '@/utils/tool.js'
+	export default {
+		props: {
+		},
+		data() {
+			return {
+				pageType: 0,
+				itemId: '',
+				time: '',
+				title: '',
+				content: '',
+				isHistory: false
+			}
+		},
+		computed: {
+			
+		},
+		methods: {
+			getItem(id) {
+				uni.showLoading()
+				uniCloud.callFunction({
+				    name: 'first',
+				    data: { 
+						url: 'getTodoItem',
+						data: {
+							id
+						}
+					}
+				}).then(res => {
+					uni.hideLoading()
+					const resData = res.result
+					
+					if(resData.code == 0) {
+						const target = resData.data && resData.data[0]
+						this.time = target.time
+						this.title = target.title
+						this.content = target.content
+						
+					}else {
+						uni.showSToast('网络错误,请稍后再试')
+					}
+					
+				}).catch(err => {
+					uni.hideLoading()
+					console.log('err', err)  
+				})
+			},
+			
+		},
+		onLoad(e) {
+			if(e.id) {
+				this.pageType = 1
+				this.itemId = e.id
+				this.getItem(this.itemId)
+			}
+		},
+		components: {
+		},
+	}
+</script>
+
+<style lang="scss">
+	.content {
+		flex: 1;
+		background-color: #f1f0f5;
+		align-items: center;
+	}
+	.time {
+		width: 750rpx;
+		height: 100rpx;
+		padding-left: 50rpx;
+		padding-right: 50rpx;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.picker-inner {
+		flex-direction: row;
+		align-items: center;
+	}
+	.date-text {
+		// font-size: 26rpx;
+		// width: 300rpx;
+		margin-right: 14rpx;
+		flex-direction: row;
+		justify-content: flex-end;
+		color: #d9c48f;
+	}
+	.date-icon {
+		width: 48rpx;
+		height: 48rpx;
+	}
+	.uni-input {
+		width: 650rpx;
+		height: 70rpx;
+		// border: 1rpx solid #999;
+		background-color: #fff;
+		border-radius: 8rpx;
+		padding-left: 10rpx;
+		padding-right: 10rpx;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+		font-size: 28rpx;
+	}
+	.uni-textarea {
+		margin-top: 16rpx;
+		width: 650rpx;
+		background-color: #fff;
+		height: 480rpx;
+		border-radius: 8rpx;
+		// border: 1rpx solid #999;
+		padding-left: 10rpx;
+		padding-right: 10rpx;
+		padding-top: 10rpx;
+		padding-bottom: 10rpx;
+		font-size: 24rpx;
+	}
+	
+</style>

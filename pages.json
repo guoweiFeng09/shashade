@@ -46,6 +46,13 @@
 			}
 		},
 		{
+			"path": "pages/todo/historyEdit",
+			"style": {
+				"navigationBarTitleText": "To Do",
+				"navigationBarBackgroundColor": "#d9c48f"
+			}
+		},
+		{
 			"path": "pages/todo/history",
 			"style": {
 				"navigationBarTitleText": "To Do 历史",

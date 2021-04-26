@@ -44,15 +44,18 @@
 				</view>
 			</view>
 		</view> 
+		
+		<updateView ref="updateView" v-if="update.isShow"></updateView>
 	</view>
 </template>
 
 <script>
 	import { timeFormat, DateDiff } from '@/utils/tool.js'
 	import moveMixin from '@/pages/index/moveMixin'
+	import updateMixin from '@/pages/index/updateMixin'
 	
 	export default {
-		mixins: [moveMixin],
+		mixins: [moveMixin, updateMixin],
 		components: {
 		},
 		data() {
@@ -67,13 +70,10 @@
 				day: 0,
 				date: '',
 				time: '',
-				
-				
 			}
 		},
 		onReady() {
 			this.checkUpdate()
-			
 			this.initMoving()
 			
 		},
@@ -123,59 +123,7 @@
 			stopBannerTimer() {
 				clearInterval(this.bannerTimer)
 			},
-			checkUpdate() {
-				console.log('checkUpdate')
-				uniCloud.callFunction({
-				    name: 'first',
-				    data: { 
-						url: 'getVersion'
-					}
-				}).then(res => {
-					const {lastVerson, downloadUrl} = res.result
-					if(lastVerson > uni.appVersion) {
-						uni.showModal({
-						    title: '大人',
-						    content: '小的检测到有更新, 要不要更新呀',
-						    success:  res => {
-						        if (res.confirm) {
-						            this.updateApp(downloadUrl)
-						        } else if (res.cancel) {
-						            console.log('用户点击取消')
-						        }
-						    }
-						})
-					}
-				}).catch(err => {
-					console.log('err', err)  
-				})
-			},
-			updateApp(url) {
-				console.log('updateApp') 
-				uni.showLoading({
-				    title: 'app下载中..'
-				})
-				uni.downloadFile({
-					url: url,
-					success: function(a) {
-						if (200 === a.statusCode) {
-							uni.hideLoading()
-							var b = a.tempFilePath;
-							
-							uni.saveFile({
-								tempFilePath: b,
-								success: function(a) {
-									plus.runtime.install(a.savedFilePath, {
-										force: !0
-									})
-								}
-							})
-						}
-					},
-					complete: (res) => {
-						console.log('complete', res)
-					}
-				})
-			},
+			
 			gotoSnow() {
 				uni.navigateTo({
 					url: '/pages/webview/index'
