@@ -19,6 +19,23 @@ function timeFormat(date, fmt) {
 
 }
 
+function getTimeNow() {
+	return timeFormat(new Date().getTime() + 8 * 3600 * 1000, 'yyyy-MM-dd hh:mm:ss')
+}
+
+function genSessionId(){
+	var length = 32
+	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+	if ( !"0"[0] ) { //fix IE67
+		str = str.split("")
+	}
+	for(var i=0,id="",len = str.length;i < length;i++){
+		id += str[Math.floor(Math.random() * len)]
+	}
+	return id
+}
 module.exports = {
-	timeFormat
+	timeFormat,
+	getTimeNow,
+	genSessionId
 }

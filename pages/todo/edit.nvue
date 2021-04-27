@@ -44,8 +44,8 @@
 			},
 			getItem(id) {
 				console.log('checkUpdate', id)
-				uni.showLoading()
-				uniCloud.callFunction({
+				// uni.showLoading()
+				uni.$http({
 				    name: 'first',
 				    data: { 
 						url: 'getTodoItem',
@@ -54,7 +54,7 @@
 						}
 					}
 				}).then(res => {
-					uni.hideLoading()
+					// uni.hideLoading()
 					const resData = res.result
 					
 					if(resData.code == 0) {
@@ -68,7 +68,7 @@
 					}
 					
 				}).catch(err => {
-					uni.hideLoading()
+					// uni.hideLoading()
 					console.log('err', err)  
 				})
 			},
@@ -95,7 +95,7 @@
 					title: this.title,
 					content: this.content,
 				}
-				uniCloud.callFunction({
+				uni.$http({
 				    name: 'first',
 				    data: { 
 						url: 'updateTodoItem',
@@ -123,7 +123,7 @@
 					title: this.title,
 					content: this.content,
 				}
-				uniCloud.callFunction({
+				uni.$http({
 				    name: 'first',
 				    data: { 
 						url: 'addTodoItem',

@@ -23,10 +23,11 @@
 			<view class="input vs-row vs-align-center margin-b40">
 				<image class="input-icon margin-r20" src="/static/account.png" mode=""></image>
 				<input class="vs-flex-item color-base font-30" password v-model="password" :maxlength="11" placeholder="请输入密码" placeholder-class="input-placeholder"/>
+				<!-- <input class="vs-flex-item color-base font-30" v-model="password" :maxlength="11" placeholder="请输入密码" placeholder-class="input-placeholder"/> -->
 			</view>
 		</view>
 		
-		<view class="button bg-color-base vs-row vs-align-center vs-space-center margin-b20" @click="gotoIndex">
+		<view class="button bg-color-base vs-row vs-align-center vs-space-center margin-b20" @click="login">
 			<text class="color-white font-34" >芝麻开门</text>
 		</view>
 		
@@ -39,41 +40,54 @@
 		data() {
 			return {
 				isShow: false,
-				mobile: '',
-				password: '',
+				mobile: '15521220234',
+				password: '20200711',
 				cloudLoginPwd: ''
 			}
 		},
 		mounted() {
 			this.isShow = true
-			this.cloudLoginPwd = uni.getStorageSync('cloudLoginPwd') || ''
-			setTimeout(() => {
-				this.password = uni.getStorageSync('loginPwd') || ''
-			}, 1000)
 		},
 		methods: {
-			gotoIndex() {
-				if(this.password !== this.cloudLoginPwd) {
-					uni.showSToast('密码错误, 不是自己人')
-				}else {
-					uni.showSToast('密码正确, 自己人')
-					uni.setStorageSync('loginPwd', this.password)
-					setTimeout(() => {
-						uni.redirectTo({
-							url: '/pages/index/index'
-						})
-					}, 1000)
-				}
-			},
-			test() {
+			hide() {
 				this.isShow = !this.isShow
 				setTimeout(() => {
-					this.hide()
+					this.$parent.loginViewShow = false
 				}, 600)
 			},
-			hide() {
-				this.$parent.loginViewShow = false
+			
+			login() {
+				const params = {
+					mobile: this.mobile,
+					password: this.password,
+					clientid: plus.push.getClientInfo().clientid || ''
+				}
+				console.log('params', params)
+				uni.$http({
+					name: 'first',
+					data: { 
+						url: 'user/login',
+						data: params
+					}
+				}).then(res => {
+					console.log('user/login', res)
+					// uni.hideLoading()
+					const resData = res.result
+					if(resData.code == 0) {
+						uni.showSToast('密码正确, 自己人')
+						uni.setStorageSync('sessionId', resData.data.sessionId)
+						this.hide()
+					}else {
+						uni.showSToast('密码错误, 不是自己人')
+						// uni.showSToast('网络错误,请稍后再试')
+					}
+					
+				}).catch(err => {
+					// uni.hideLoading()
+					console.log('err', err)  
+				})
 			}
+			
 		
 		}
 	}

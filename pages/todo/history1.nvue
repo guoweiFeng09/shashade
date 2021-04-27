@@ -34,8 +34,8 @@
 		},
 		methods: {
 			getList(noLoading) {
-				!noLoading && uni.showLoading()
-				uniCloud.callFunction({
+				// !noLoading && uni.showLoading()
+				uni.$http({
 				    name: 'first',
 				    data: { 
 						url: 'getTodoListDone'
@@ -50,11 +50,11 @@
 						this.isLoad = true
 					}
 					// const {lastVerson, downloadUrl} = res.result
-					uni.hideLoading()
+					// uni.hideLoading()
 					uni.stopPullDownRefresh()
 				}).catch(err => {
 					console.log('err', err)  
-					uni.hideLoading()
+					// uni.hideLoading()
 					this.isLoad = true
 					uni.stopPullDownRefresh()
 				})

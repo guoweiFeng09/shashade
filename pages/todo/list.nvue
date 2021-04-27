@@ -51,8 +51,8 @@
 				})
 			},
 			getList(noLoading) {
-				!noLoading && uni.showLoading()
-				uniCloud.callFunction({
+				// !noLoading && uni.showLoading()
+				uni.$http({
 				    name: 'first',
 				    data: { 
 						url: 'getTodoList'
@@ -65,15 +65,12 @@
 						this.list = resData.data
 						this.isLoad = true
 					}else {
-						uni.showSToast('网络错误,请稍后再试')
 						this.isLoad = true
 					}
-					// const {lastVerson, downloadUrl} = res.result
-					uni.hideLoading()
 					uni.stopPullDownRefresh()
 				}).catch(err => {
 					console.log('err', err)  
-					uni.hideLoading()
+					// uni.hideLoading()
 					this.isLoad = true
 					uni.stopPullDownRefresh()
 				})
@@ -95,7 +92,7 @@
 				        if (res.confirm) {
 				            item.done = 1
 				            setTimeout(() => {
-				            	uniCloud.callFunction({
+				            	uni.$http({
 				            	    name: 'first',
 				            	    data: { 
 				            			url: 'updateTodoItemComplete',

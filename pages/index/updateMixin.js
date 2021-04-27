@@ -19,7 +19,7 @@ export default {
 	methods: {
 		checkUpdate() {
 			console.log('checkUpdate')
-			uniCloud.callFunction({
+			uni.$http({
 			    name: 'first',
 			    data: { 
 					url: 'getVersion'

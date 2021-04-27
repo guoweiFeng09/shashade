@@ -78,13 +78,9 @@
 			}
 		},
 		onReady() {
+			this.checkSession()
 			this.checkUpdate()
 			this.initMoving()
-			
-			setTimeout(() => {
-				this.loginViewShow = true
-			}, 2000)
-			
 		},
 		beforeCreate() {
 			// const domModule = uni.requireNativePlugin('dom')
@@ -151,6 +147,34 @@
 					urls: [url]
 				})
 			},
+			checkSession() {
+				const sessionId = uni.getStorageSync('sessionId') || ''
+				if(sessionId) {
+					uni.$http({
+					    name: 'first',
+					    data: { 
+							url: 'user/checkSession',
+							data: {}
+						}
+					}).then(res => {
+						const resData = res.result
+						if(resData.code == 0) {
+							
+						}else {
+							setTimeout(() => {
+								this.loginViewShow = true
+							}, 200)
+						}
+					}).catch(err => {
+						// uni.hideLoading()
+						console.log('err', err)  
+					})
+				}else {
+					setTimeout(() => {
+						this.loginViewShow = true
+					}, 200)
+				}
+			}
 			
 		}
 	}

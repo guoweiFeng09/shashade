@@ -1,11 +1,10 @@
 import Vue from 'vue'
 import App from './App'
 
-Vue.config.productionTip = false
+import request from '@/utils/request'
 
 uni.appVersion = '1.0.3'
-
-App.mpType = 'app'
+uni.$http = request
 
 uni.showSToast = function (msg, duration = 1500) {
 	uni.showToast({
@@ -14,6 +13,9 @@ uni.showSToast = function (msg, duration = 1500) {
 		duration
 	})
 }
+
+Vue.config.productionTip = false
+App.mpType = 'app'
 
 const app = new Vue({
     ...App
