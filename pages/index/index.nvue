@@ -46,6 +46,7 @@
 		</view> 
 		
 		<updateView ref="updateView" v-if="update.isShow"></updateView>
+		<loginView v-if="loginViewShow" :show.sync="loginViewShow"></loginView>
 	</view>
 </template>
 
@@ -54,9 +55,12 @@
 	import moveMixin from '@/pages/index/moveMixin'
 	import updateMixin from '@/pages/index/updateMixin'
 	
+	import loginView from '@/pages/login/login'
+	
 	export default {
 		mixins: [moveMixin, updateMixin],
 		components: {
+			loginView
 		},
 		data() {
 			return {
@@ -70,11 +74,16 @@
 				day: 0,
 				date: '',
 				time: '',
+				loginViewShow: false,
 			}
 		},
 		onReady() {
 			this.checkUpdate()
 			this.initMoving()
+			
+			setTimeout(() => {
+				this.loginViewShow = true
+			}, 2000)
 			
 		},
 		beforeCreate() {

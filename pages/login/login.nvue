@@ -1,15 +1,21 @@
 <template>
-	<view class="container">
+	<view class="login-container" :class="[isShow ? 'translateY0' : 'translateY100']" @click.stop>
 		<view class="bg bg-color-base margin-b20"></view>
 		
 		<view class="tab vs-row vs-align-center">
 			<image class="tab-bg" src="/static/banner-icon.png" mode=""></image>
 			
-			<view class="vs-row vs-align-center">
+			<view class="vs-row vs-align-center" @click="test">
 				<view class="vs-column vs-align-center margin-r40">
 					<text class="font-50 margin-b20 color-base">嘻嘻</text>
 					<view class="line bg-color-base"></view>
 				</view>
+			</view>
+		</view>
+		<view class="login">
+			<view class="input vs-row vs-align-center margin-b40">
+				<image class="input-icon margin-r20" src="/static/account.png" mode=""></image>
+				<input class="vs-flex-item color-base font-30" v-model="mobile" :maxlength="11" placeholder="请输入手机号" placeholder-class="input-placeholder"/>
 			</view>
 		</view>
 		
@@ -32,16 +38,18 @@
 	export default {
 		data() {
 			return {
+				isShow: false,
+				mobile: '',
 				password: '',
 				cloudLoginPwd: ''
 			}
 		},
-		onLoad() {
-			this.cloudLoginPwd =  uni.getStorageSync('cloudLoginPwd') || ''
+		mounted() {
+			this.isShow = true
+			this.cloudLoginPwd = uni.getStorageSync('cloudLoginPwd') || ''
 			setTimeout(() => {
 				this.password = uni.getStorageSync('loginPwd') || ''
 			}, 1000)
-			
 		},
 		methods: {
 			gotoIndex() {
@@ -57,14 +65,39 @@
 					}, 1000)
 				}
 			},
+			test() {
+				this.isShow = !this.isShow
+				setTimeout(() => {
+					this.hide()
+				}, 600)
+			},
+			hide() {
+				this.$parent.loginViewShow = false
+			}
 		
 		}
 	}
 </script>
 
 <style lang="scss">
-	.container {
-		position: relative;
+	.translateY0 {
+		transform: translateY(0%);
+	}
+	.translateY100 {
+		transform: translateY(100%);
+	}
+	.login-container {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: #fff;
+		// transform: translateY(100%);
+		transition-property: transform;
+		transition-duration: 0.6s;
+		transition-delay: 0s;
+		transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1.0);
 	}
 	
 	.bg {
