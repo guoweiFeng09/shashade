@@ -40,8 +40,8 @@
 		data() {
 			return {
 				isShow: false,
-				mobile: '15521220234',
-				password: '20200711',
+				mobile: '',
+				password: '',
 				cloudLoginPwd: ''
 			}
 		},
@@ -57,6 +57,14 @@
 			},
 			
 			login() {
+				if(this.mobile === '') {
+					uni.showSToast('请输入手机号')
+					return
+				}
+				if(this.password === '') {
+					uni.showSToast('请输入密码')
+					return
+				}
 				const params = {
 					mobile: this.mobile,
 					password: this.password,

@@ -16,6 +16,7 @@
 					</view>
 				</view>
 				<image class="list-item-expired-gif" src="/static/todo/expired.gif" mode="" v-if="item.isExpiredWarning"></image>
+				<view class="list-item-upate-tips" v-if="!item.isRead"></view>
 				<!-- <image class="list-item-expired-gif" src="/static/todo/done.jpg" mode=""></image> -->
 			</view>
 		</scroll-view>
@@ -187,10 +188,19 @@
 			
 			&-expired-gif {
 				position: absolute;
-				right: 0;
+				right: 14rpx;
 				top: 0;
 				width: 80rpx;
 				height: 80rpx;
+			}
+			&-upate-tips {
+				position: absolute;
+				right: 4rpx;
+				top: 4rpx;
+				width: 20rpx;
+				height: 20rpx;
+				border-radius: 50%;
+				background-color: #ff3b30;
 			}
 		}
 		&-done{

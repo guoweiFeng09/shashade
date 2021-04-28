@@ -27,7 +27,7 @@ module.exports = async (db, event) => {
 			return update(db, data, event)
 			break
 		case 'getTodoList':
-			return get(db, data)
+			return get(db, data, event)
 			break
 		case 'getTodoListDone':
 			return getdone(db, data)
@@ -37,6 +37,12 @@ module.exports = async (db, event) => {
 			break
 		case 'updateTodoItemComplete':
 			return todoItemComplete(db, data, event)
+			break
+		case 'updateTodoItemRead':
+			return updateTodoItemRead(db, data, event)
+			break
+		case 'updateTodoItemUnRead':
+			return updateTodoItemUnRead(db, data, event)
 			break
 		
 	}
@@ -73,6 +79,7 @@ async function update(db, data, event) {
 	
 	// console.log('update', data, dbData, res)
 	// todoUpdatePush(group) //更新推送
+	await updateTodoItemUnRead(db, data, event)
 	await formatDataToPush(db, event)
 	return res
 }
@@ -91,9 +98,22 @@ async function todoItemComplete(db, data, event) {
 	return res
 }
 
-async function get(db, data) {
+async function get(db, data, event) {
 	// const { id } = data
 	const dbData = await db.collection(collection).where({done: 0}).orderBy("time", "asc").get()
+	
+	const user = await getUser({db, event})
+	const readtododbData = await db.collection('readtodo').where({mobile: user.mobile}).get()
+	const readtodo = readtododbData.data && readtododbData.data[0]
+	
+	dbData.data.forEach(item => {
+		if(readtodo[item.id]) {
+			item.isRead = true
+		}else {
+			item.isRead = false
+		}
+	})
+	
 	const isSuceess = dbData.data
 	let res = failRes
 	if(isSuceess) {
@@ -140,13 +160,13 @@ async function formatDataToPush(db, event) {
 	const { data, sessionId } = event
 	const userDB = await db.collection('user').where({sessionId}).get()
 	const user = userDB.data && userDB.data[0]
-	// const groupDB = await db.collection('group').where({
-	// 	groupId: user.groupId,
-	// 	mobile: db.command.neq(user.mobile)
-	// }).get()
 	const groupDB = await db.collection('group').where({
-		mobile: user.mobile
+		groupId: user.groupId,
+		mobile: db.command.neq(user.mobile)
 	}).get()
+	// const groupDB = await db.collection('group').where({
+	// 	mobile: user.mobile
+	// }).get()
 	const group = groupDB.data
 	if(group) {
 		for(let i = 0; i < group.length; i++) {
@@ -159,5 +179,3 @@ async function formatDataToPush(db, event) {
 		}
 	}
 }
-
-

@@ -3,7 +3,7 @@ import App from './App'
 
 import request from '@/utils/request'
 
-uni.appVersion = '1.0.3'
+uni.appVersion = '1.0.5'
 uni.$http = request
 
 uni.showSToast = function (msg, duration = 1500) {

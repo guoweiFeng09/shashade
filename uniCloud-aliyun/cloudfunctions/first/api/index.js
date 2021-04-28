@@ -22,6 +22,7 @@ module.exports = (event) => {
 		case 'getTodoListDone':
 		case 'getTodoItem':
 		case 'updateTodoItemComplete':
+		case 'updateTodoItemRead':
 			return todo(db, event)
 			break
 		case 'user/login':

@@ -145,13 +145,39 @@
 					console.log('err', err)  
 				})
 				
-			}
+			},
+			updateTodoItemRead() {
+				const params = {
+					id: this.itemId,
+				}
+				uni.$http({
+				    name: 'first',
+				    data: { 
+						url: 'updateTodoItemRead',
+						data: params
+					}
+				}).then(res => {
+					console.log('resData', res)  
+					const resData = res.result
+					// if(resData.code == 0) {
+					// 	uni.showSToast('保存成功')
+					// 	setTimeout(() => {
+					// 		uni.navigateBack()
+					// 	}, 1500)
+					// }else {
+					// 	uni.showSToast('网络错误,请稍后再试')
+					// }
+				}).catch(err => {
+					console.log('err', err)  
+				})
+			},
 		},
 		onLoad(e) {
 			if(e.id) {
 				this.pageType = 1
 				this.itemId = e.id
 				this.getItem(this.itemId)
+				this.updateTodoItemRead()
 			}else {
 				const now = new Date()
 				this.time = timeFormat(now, 'yyyy-MM-dd')
