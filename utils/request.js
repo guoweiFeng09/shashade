@@ -19,7 +19,7 @@ export default async function(data, config = {}) {
 	
 	return new Promise(async (resolve, reject) => {
 		await uniCloud.callFunction(data).then(res => {
-			console.log('uniCloud.callFunction', res)
+			// console.log('uniCloud.callFunction', res)
 			resolve(res)
 		}).catch(err => {
 			console.log('err', err) 

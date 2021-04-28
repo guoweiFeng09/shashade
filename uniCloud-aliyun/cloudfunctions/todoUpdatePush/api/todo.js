@@ -5,7 +5,7 @@ const util = require('../utils/tool.js')
 // 表名称
 const collection = 'todo'
 
-module.exports = async () => {
+module.exports = async (event) => {
 	// 查询 todoList
 	// const dbData = await db.collection(collection).where({done: 0}).orderBy("time", "asc").get()
 	// if(dbData.data.length < 1) return 'list empty'
@@ -13,8 +13,11 @@ module.exports = async () => {
 	// const expiredDistance = 3600 * 24 * 1000 *  7 // 7-天数
 	// const pushArr = dbData.data.filter(item => new Date(item.time).getTime() - new Date().getTime() + 8 * 3600 * 1000 < expiredDistance)
 	// let msg = pushArr.map(item => item.title).join('、')
-	const title = 'ToDo更新提醒'
-	const content = `ToDo有新消息。傻傻的快去看看哦`
+	// const title = 'ToDo更新提醒'
+	// const content = `ToDo有新消息。傻傻的快去看看哦`
+	const title = event.title
+	const content = event.content
+	const clientid = event.clientid
 	
 	const pushData = {
 		title,
@@ -32,15 +35,17 @@ module.exports = async () => {
 				// t: new Date().getTime()
 			}
 		}),
+		clientid,
+		// clientid: '09a67254c02a967c8a4e6cdff50abb33',
 		// clientid:'2bea043336c3e3f8c00bdac8b55c0c5a'
 	}
 	// console.log('pushArr', pushArr)
 	// console.log('pushData', pushData)
-	
 	//单推
-	// return await UniPush("toSingle", pushData)
+	const res = await UniPush("toSingle", pushData)
+	return res
 	//群推
-	return await UniPush("toApp", pushData)
+	// return await UniPush("toApp", pushData)
 	
 	// let res = get()
 	// console.log('离线时显示的标题', res)

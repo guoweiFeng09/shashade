@@ -32,7 +32,6 @@ module.exports = async (db, event) => {
 async function login(db, data) {
 	const { mobile, password, clientid } = data
 	const dbData = await db.collection(collection).where({mobile}).get()
-	console.log('dbData', dbData)
 	const isSuceess = dbData.data
 	let res
 	
@@ -47,7 +46,7 @@ async function login(db, data) {
 		  sessionId,
 		  updateTime
 		})
-		await db.collection('pushgroup').where({mobile}).update({
+		await db.collection('group').where({mobile}).update({
 		  clientid,
 		  updateTime
 		})
@@ -63,7 +62,6 @@ async function login(db, data) {
 
 
 async function checkSession(db, data) {
-	console.log('checkSession', data)
 	const { sessionId } = data
 	const dbData = await db.collection(collection).where({sessionId}).get()
 	const isSuceess = dbData.data

@@ -9,8 +9,8 @@
 				</view>
 			</view>
 		</view>
-		<view class="uni-input">{{title}}</view>
-		<view class="uni-textarea">{{content}}</view>
+		<view class="uni-input"><text class="fs28">{{title}}</text></view>
+		<view class="uni-textarea"><text class="fs24">{{content}}</text></view>
 	</view>
 </template>
 
@@ -117,7 +117,9 @@
 		padding-right: 10rpx;
 		padding-top: 10rpx;
 		padding-bottom: 10rpx;
-		font-size: 28rpx;
+		font-size: 24rpx;
+		display: flex;
+		justify-content: center;
 	}
 	.uni-textarea {
 		margin-top: 16rpx;
@@ -130,6 +132,12 @@
 		padding-right: 10rpx;
 		padding-top: 10rpx;
 		padding-bottom: 10rpx;
+		font-size: 18rpx;
+	}
+	.fs28 {
+		font-size: 28rpx;
+	}
+	.fs24 {
 		font-size: 24rpx;
 	}
 	
